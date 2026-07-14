@@ -3,3 +3,4 @@ pydantic
 pydantic-settings
 inngest
 python-dotenv
+fastapi

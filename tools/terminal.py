@@ -3,7 +3,7 @@ from config import settings
 
 
 def run_bash_command(command: str) -> str:
-    f"""
+    """
     Safely executes bash terminal commands locally and intercepts the output.
     """
     #Primary command
