@@ -1,102 +1,159 @@
 
-# Stateless Coding Agent Platform
+# Forge: Durable & Modular Coding Agent Platform
 
-A modular, highly resilient backend architecture designed for driving autonomous AI coding agents. This platform leverages a strict separation of concerns, ensuring that agent profiles remain entirely stateless, while the execution harness controls security guardrails, hardware connectivity, and LLM communication.
+Forge is a production-grade, highly resilient backend engine framework built for orchestrating autonomous AI software engineering agents. 
+
+By anchoring the codebase on a strict **Separation of Concerns**, the system ensures that AI agent profiles remain completely stateless text processing units, while the surrounding Python runtime harness guarantees strict security guardrails, hardware access, data normalization, and fault-tolerant long-term memory.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🏗️ Architectural Systems Design
 
-The system is split into independent micro-modules to ensure complete horizontal scalability. If you need to switch LLM providers, add tools, or create multi-agent verification chains, you only modify the specific module responsible for that domain.
+Forge divides system logic into independent, isolated micro-modules. This modular approach ensures absolute horizontal scalability—allowing you to scale out toolkits, add alternative model providers, or stitch multi-agent review hierarchies without modifying the core execution loop.
 
 ```text
-coding_agent/
+forge/
 │
-├── config.py         # Centralized environment configurations & guardrail definitions
-├── main.py           # Application Factory entry point (FastAPI + Inngest integration)
+├── config.py         # Centralized environment configurations & path scopes
+├── main.py           # Application Factory entry point (FastAPI + Inngest)
+├── pyproject.toml    # Virtual environment constraints and dependencies
 │
 ├── agents/
 │   ├── __init__.py
-│   └── registry.py   # Pure configuration definitions of stateless agent personas
+│   └── registry.py   # Data blueprints of stateless agent personas
 │
 ├── harness/
 │   ├── __init__.py
-│   ├── client.py     # Provider-agnostic LLM network communication wrapper
-│   ├── engine.py     # Stateless single-step reasoning loop processor
-│   └── queue.py      # Stateful, durable background worker queue (Inngest workflows)
+│   ├── client.py     # Provider-agnostic LLM network diplomat layer
+│   ├── engine.py     # Stateless single-step inference & parsing processor
+│   └── queue.py      # Stateful, durable execution orchestrator (Inngest)
 │
 └── tools/
     ├── __init__.py
-    └── terminal.py   # System-level hardware execution interfaces & tool schemas
+    └── terminal.py   # Hardware execution interface & JSON tool schemas
 
 ```
 
 ---
 
-## 🧩 Core Modules & Components
+## 🧩 Comprehensive Module Breakdown
 
-### 1. Configuration Layer (`config.py`)
+### 🛡️ 1. The Configuration Layer (`config.py`)
 
-Acts as the **Single Source of Truth** for the execution workspace. It safely loads credentials from local environments and anchors the runtime boundaries via an explicit execution command whitelist to prevent rogue actions.
+Acts as the global **Single Source of Truth** for the entire project workspace runtime environment.
 
-### 2. Hardware Interface Layer (`tools/terminal.py`)
+* Safely resolves project workspace boundaries dynamically using absolute base directory evaluations.
+* Maintains a rigorous security command whitelist array (`ALLOWED_COMMANDS`) to instantly catch and deflect malicious terminal activities before execution.
+* Utilizes `pydantic-settings` to deliver fast type-validated app state configurations on server initialization.
 
-Acts as the physical hands of the agent on the local keyboard. It wraps Python's `subprocess` utility to cleanly route terminal commands, convert binary byte streams into readable text strings, and enforce the security whitelist interceptor before commands hit the host machine.
+### 🔌 2. The Hardware Interface (`tools/terminal.py`)
 
-### 3. Stateless Registry Layer (`agents/registry.py`)
+Serves as the physical hands of the AI agent on the host system keyboard.
 
-Maintains pure data configurations of who the agent is (personas/instructions). It contains zero runtime state or memory. It exposes a `compile_agent_prompt` function that dynamically injects real-time workspace directories and whitelisted parameters straight into the prompt sequence.
+* Interfaces natively with the host operating system shell using Python's `subprocess` utility.
+* Acts as a critical security proxy, intercepting and cross-checking the primary token keyword of all generated command requests against the global configuration whitelist.
+* Intercepts system byte logs, cleans stdout/stderr, handles exceptions, and forces a maximum **20-second timeout threshold** to cleanly block zombie loops or interactive user-input deadlocks.
+* Exposes the standardized OpenAPI function call JSON blueprint schema to advertise its capabilities to the LLM backend.
 
-### 4. Network Client Layer (`harness/client.py`)
+### 🎭 3. The Stateless Registry Layer (`agents/registry.py`)
 
-Provides a provider-agnostic wrapper around the LLM client infrastructure. It separates the native SDK syntax from the engine loop, automatically mounting functional JSON tool schemas onto every outbound payload block.
+Maintains pure data blueprints defining individual agent behaviors, parameters, and instructions.
 
-### 5. Reasoning Engine Layer (`harness/engine.py`)
+* **100% Stateless Architecture:** Profiles possess absolutely no execution tracking state, context arrays, or token memory allocations.
+* Features a dynamic **Prompt Compiler** (`compile_agent_prompt`) that programmatically flushes real-time environment scopes, current system directories, and strict operational boundaries directly into the final system message block right before inference.
 
-The stateless processing unit that drives individual execution steps. It accepts an agent persona and an isolated slice of context history, extracts the predicted thoughts, and deserializes flat JSON strings from the LLM back into workable Python dictionary configurations.
+### 📡 4. The Network Client Layer (`harness/client.py`)
+
+Serves as an isolated, provider-agnostic abstraction envelope around the LLM provider SDK fabric.
+
+* Completely protects the inner platform engine mechanics from changes to third-party SDK syntaxes.
+* Responsible for dynamically mounting tool schemas and assigning execution properties (`tool_choice="auto"`) onto outgoing network call streams.
+* Easily customizable to switch endpoints between OpenAI, Anthropic, or local open-source models via Ollama.
+
+### 🧠 5. The Reasoning Engine Layer (`harness/engine.py`)
+
+The stateless calculator that handles processing independent conversation steps.
+
+* Reconstructs the systemic history layout block dynamically by blending compiled system directives smoothly with historical conversation slices.
+* Extracts the predicted thoughts out of incoming network payload segments.
+* Automatically converts and sanitizes raw, complex Pydantic response objects into clean Python native primitive objects via `.model_dump()` to ensure problem-free upstream serialization.
+
+### 🔄 6. The Durable Orchestration Queue (`harness/queue.py`)
+
+The stateful, fault-tolerant heartbeat that orchestrates the continuous Think-Act-Observe cycle.
+
+* Implements **Durable Execution** using Inngest background event processing loops.
+* Uses cryptographic step-level checkpoints (`ctx.step.run`) to permanently write intermediate LLM choices and terminal tool logs into a persistent state ledger.
+* Prevents data and monetary loss: If a network timeout, code exception, or server crash happens midway through a complex task, the queue resumes precisely from the last successful step without wasting tokens on recalculating previous states.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Step-by-Step Installation & Bootup
 
 ### Prerequisites
 
-Make sure you have [uv](https://github.com/astral-sh/uv) installed on your host system.
+* Ensure that [uv](https://github.com/astral-sh/uv) is installed.
+* Node.js runtime installed (for running the Inngest local dev dashboard).
 
-### 1. Project Initialization & Setup
+### 1. Synchronize the Environment
 
-Clone or navigate to your project directory and synchronize the virtual runtime environment:
+Navigate into your local workspace directory and align the virtual environment states using the lockfile configuration:
 
 ```bash
-# Verify dependencies are aligned matching the lockfile
 uv sync
 
 ```
 
-### 2. Configure Environment Variables
+### 2. Configure Environment Keys
 
-Create a `.env` configuration file in the absolute root folder:
+Create a `.env` configuration template in the absolute root folder next to `pyproject.toml`:
 
 ```env
-OPENAI_API_KEY="your-secret-openai-api-key"
+OPENAI_API_KEY="your-actual-secret-openai-api-key"
 ENVIRONMENT="sandbox-v1"
 
 ```
 
-### 3. Running the Server Assembly
+### 3. Initialize the Web Server Framework
 
-Launch the FastAPI development environment using the Application Factory assembly:
+Boot up the FastAPI platform server application layer through your locked local project environment:
 
 ```bash
-uv run uvicorn main:app --reload
+uv run python -m uvicorn main:app --reload
+
+```
+
+*The host API endpoint will now be active, scanning, and listening on `http://127.0.0.1:8000`.*
+
+### 4. Ignite the Inngest Developer Workspace
+
+Open a secondary terminal workspace pane, head to the project folder root, and spawn the visual event streaming dashboard pipeline:
+
+```bash
+npx inngest-cli@latest dev -u [http://127.0.0.1:8000/api/inngest](http://127.0.0.1:8000/api/inngest)
 
 ```
 
 ---
 
-## 🔒 Security Guardrails
+## 🕹️ Driving Your First Agent Job Sequence
 
-* **Whitelisted Subprocesses:** The application checks the primary keyword of all agent tool actions against a strict array constraint defined inside `config.py`.
-* **Execution Timeouts:** Terminal tasks are throttled with a maximum timeout threshold of 20 seconds per operation to prevent zombie processes and infinite runtime execution loops.
+1. Launch your browser window and navigate to the visual engineering panel layout running at **`http://localhost:8288`**.
+2. Click the **Send test event** button in the top-right console dashboard region.
+3. Configure the **Event Name** mapping parameter value explicitly to: `agent/run.task`
+4. Paste the following structured data payload block inside the JSON input editor, adjusting parameters as desired:
+
+```json
+{
+  "name": "agent/run.task",
+  "data": {
+    "task": "Create a new directory named 'forge_output', go inside it, and create a text file named 'success.txt' with the content 'Forge is alive!'.",
+    "model_name": "gpt-4o-mini"
+  }
+}
+
+```
+
+5. Click **Invoke**. Go to the **Runs** tab to watch the execution waterfall graph log steps, execute shell actions, and record immutable checkpoints in real-time.
 
 ```
