@@ -1,3 +1,4 @@
+```
 # Forge: Durable, Multi-Provider Coding Agent Platform
 
 Forge is a production-grade, highly resilient backend engine framework engineered to drive autonomous AI software engineering agents. 
@@ -167,4 +168,5 @@ Forge 🤖 ❯ Select model target [default: gpt-4o-mini]: groq/llama-3.3-70b-sp
 
 Open your Inngest Dev Dashboard at **`http://localhost:8288/runs`** to watch the waterfall timeline execute code, trigger the whitelisted hardware steps, and record immutable checkpoints in real-time.
 
+```
 ```
