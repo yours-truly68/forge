@@ -1,53 +1,57 @@
 import os
 from pydantic_settings import BaseSettings
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 class Settings(BaseSettings):
     OPENAI_API_KEY: str=os.getenv("OPENAI_API_KEY")
     VERCEL_BASE_URL: str=os.getenv("VERCEL_BASE_URL")
     GROQ_API_KEY:str =os.getenv("GROQ_API_KEY")
     ENVIRONMENT: str ="sandbox-v1"
-    PROJECT_ROOT: str = os.getcwd()
+    PROJECT_ROOT: str = BASE_DIR
     ALLOWED_COMMANDS: list[str] = [
-    "ls",
-    "pwd",
-    "cd",
-    "cat",
-    "find",
-    "grep",
-    "tree",
+        "ls",
+        "pwd",
+        "cd",
+        "cat",
+        "find",
+        "grep",
+        "tree",
 
-    "git",
-    "uv",
-    "python",
-    "pytest",
+        "git",
+        "uv",
+        "python",
+        "pytest",
 
-    "npm",
-    "npx",
-    "pnpm",
-    "yarn",
+        "npm",
+        "npx",
+        "pnpm",
+        "yarn",
 
-    "node",
+        "node",
 
-    "mkdir",
-    "touch",
-    "cp",
-    "mv",
+        "mkdir",
+        "touch",
+        "cp",
+        "mv",
 
-    "echo",
+        "echo",
 
-    "cargo",
-    "go",
-    "java",
-    "javac",
-    "mvn",
-    "gradle",
+        "cargo",
+        "go",
+        "java",
+        "javac",
+        "mvn",
+        "gradle",
 
-    "pip",
-    "pip3",
-]
+        "pip",
+        "pip3",
+    ]
     
     class Config:
-        env_file=".env"
+        # Pass the absolute path straight to the environment loader
+        env_file = os.path.join(BASE_DIR, ".env")
+        extra = "ignore"  # Gracefully ignore extra fields if present
 
 
 settings = Settings()
