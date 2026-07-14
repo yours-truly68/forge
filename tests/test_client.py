@@ -14,7 +14,7 @@ messages = [
 ]
 
 print("Sending request to LLM Brain...")
-response = harness_client.call_brain(model_name="gpt-4o", messages=messages)
+response = harness_client.call_brain(model_name="gpt-4o-mini", messages=messages)
 
 print("\n--- LLM Response Received ---")
 print(f"Text Content: {response.content}")
