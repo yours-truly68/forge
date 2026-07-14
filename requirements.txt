@@ -1,0 +1,5 @@
+openai
+pydantic
+pydantic-settings
+inngest
+python-dotenv
