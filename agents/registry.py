@@ -21,8 +21,7 @@ CODE_EXECUTOR = AgentPersona(
 
 def compile_agent_prompt(agent: AgentPersona) -> str:
     """
-    Takes a stateless agent persona and dynamically binds the active
-    global system context and security rules into its final system prompt.
+    Takes a stateless agent persona and dynamically binds the active global system context and security rules into its final system prompt.
     """
     global_context = (
         f"\n\n[CRITICAL OPERATING BOUNDARIES]"
