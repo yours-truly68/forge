@@ -1,36 +1,36 @@
+# Forge: Durable, Multi-Provider Coding Agent Platform
 
-# Forge: Durable & Modular Coding Agent Platform
+Forge is a production-grade, highly resilient backend engine framework engineered to drive autonomous AI software engineering agents. 
 
-Forge is a production-grade, highly resilient backend engine framework built for orchestrating autonomous AI software engineering agents. 
-
-By anchoring the codebase on a strict **Separation of Concerns**, the system ensures that AI agent profiles remain completely stateless text processing units, while the surrounding Python runtime harness guarantees strict security guardrails, hardware access, data normalization, and fault-tolerant long-term memory.
+By anchoring the platform on a strict **Separation of Concerns**, the system ensures that AI agent personas remain completely stateless runtime entities, while the surrounding environment layers guarantee robust security guardrails, dynamic multi-provider API routing (OpenAI, Groq, Vercel AI Gateway, and local Ollama), structural data serialization, and fault-tolerant long-term memory.
 
 ---
 
 ## 🏗️ Architectural Systems Design
 
-Forge divides system logic into independent, isolated micro-modules. This modular approach ensures absolute horizontal scalability—allowing you to scale out toolkits, add alternative model providers, or stitch multi-agent review hierarchies without modifying the core execution loop.
+Forge isolates layout concerns into modular micro-packages. This decoupled design makes horizontal scaling seamless—allowing you to extend utility toolsets, introduce alternative foundation gateways, or orchestrate complex verification loops without modifying the core inference loop.
 
 ```text
 forge/
 │
 ├── config.py         # Centralized environment configurations & path scopes
-├── main.py           # Application Factory entry point (FastAPI + Inngest)
-├── pyproject.toml    # Virtual environment constraints and dependencies
+├── main.py           # Application Factory setup (FastAPI + Inngest)
+├── cli.py            # Interactive CLI & credential configuration manager
+├── pyproject.toml    # Virtual environment rules and dependencies
 │
 ├── agents/
 │   ├── __init__.py
-│   └── registry.py   # Data blueprints of stateless agent personas
+│   └── registry.py   # Immutable system parameters of stateless agent personas
 │
 ├── harness/
 │   ├── __init__.py
-│   ├── client.py     # Provider-agnostic LLM network diplomat layer
-│   ├── engine.py     # Stateless single-step inference & parsing processor
-│   └── queue.py      # Stateful, durable execution orchestrator (Inngest)
+│   ├── client.py     # Provider-agnostic API switchboard & gateway router
+│   ├── engine.py     # Stateless single-step inference execution processor
+│   └── queue.py      # Stateful, durable background execution orchestrator (Inngest)
 │
 └── tools/
     ├── __init__.py
-    └── terminal.py   # Hardware execution interface & JSON tool schemas
+    └── terminal.py   # Protected system-level execution utilities & schemas
 
 ```
 
@@ -40,120 +40,131 @@ forge/
 
 ### 🛡️ 1. The Configuration Layer (`config.py`)
 
-Acts as the global **Single Source of Truth** for the entire project workspace runtime environment.
+Acts as the global **Single Source of Truth** for system parameters.
 
-* Safely resolves project workspace boundaries dynamically using absolute base directory evaluations.
-* Maintains a rigorous security command whitelist array (`ALLOWED_COMMANDS`) to instantly catch and deflect malicious terminal activities before execution.
-* Utilizes `pydantic-settings` to deliver fast type-validated app state configurations on server initialization.
+* Resolves workspace boundaries using script-relative absolute path processing to prevent environment collision.
+* Maintains a rigorous command execution blocklist (`ALLOWED_COMMANDS`) to instantly trap and neutralize unauthorized terminal inputs before they touch the processor.
+* Leverages `pydantic-settings` to deliver unified, type-validated app state configurations on initialization.
 
-### 🔌 2. The Hardware Interface (`tools/terminal.py`)
+### 🎭 2. The Stateless Registry Layer (`agents/registry.py`)
 
-Serves as the physical hands of the AI agent on the host system keyboard.
+Maintains pure data blueprints defining structural agent prompts and instructions.
 
-* Interfaces natively with the host operating system shell using Python's `subprocess` utility.
-* Acts as a critical security proxy, intercepting and cross-checking the primary token keyword of all generated command requests against the global configuration whitelist.
-* Intercepts system byte logs, cleans stdout/stderr, handles exceptions, and forces a maximum **20-second timeout threshold** to cleanly block zombie loops or interactive user-input deadlocks.
-* Exposes the standardized OpenAPI function call JSON blueprint schema to advertise its capabilities to the LLM backend.
+* **100% Stateless Architecture:** Persona vectors hold absolutely zero active step parameters, system context arrays, or operational token memory slots.
+* Employs a text compilation driver (`compile_agent_prompt`) that dynamically flushes current local directory states and operational boundaries into the runtime prompt trace immediately before inference.
 
-### 🎭 3. The Stateless Registry Layer (`agents/registry.py`)
+### 🔌 3. The Protected Hardware Interface (`tools/terminal.py`)
 
-Maintains pure data blueprints defining individual agent behaviors, parameters, and instructions.
+Serves as the physical hands of the AI agent on the host machine.
 
-* **100% Stateless Architecture:** Profiles possess absolutely no execution tracking state, context arrays, or token memory allocations.
-* Features a dynamic **Prompt Compiler** (`compile_agent_prompt`) that programmatically flushes real-time environment scopes, current system directories, and strict operational boundaries directly into the final system message block right before inference.
+* Connects directly with the operating system shell using Python's primitive `subprocess` utility.
+* Acts as an inline security interceptor, checking the first keyword token of all incoming agent requests against the global configuration whitelist.
+* Intercepts standard streams, cleans output buffers, catches system exceptions, and forces a hard **20-second execution timeout** to prevent zombie loops or interactive prompt blockages.
 
-### 📡 4. The Network Client Layer (`harness/client.py`)
+### 📡 4. The Multi-Provider Gateway Client (`harness/client.py`)
 
-Serves as an isolated, provider-agnostic abstraction envelope around the LLM provider SDK fabric.
+An advanced, provider-agnostic networking diplomat that abstracts vendor configurations away from the loop.
 
-* Completely protects the inner platform engine mechanics from changes to third-party SDK syntaxes.
-* Responsible for dynamically mounting tool schemas and assigning execution properties (`tool_choice="auto"`) onto outgoing network call streams.
-* Easily customizable to switch endpoints between OpenAI, Anthropic, or local open-source models via Ollama.
+* Dynamically routes structural payload messages to OpenAI, Groq Cloud, Vercel AI Gateway, or local Ollama instances based on simple string prefixes (`groq/`, `vercel/`, `local-`).
+* Leverages OpenAI-compatible API layers to maintain a unified method structure while mounting operational function schemas (`tool_choice="auto"`) across all models natively.
 
 ### 🧠 5. The Reasoning Engine Layer (`harness/engine.py`)
 
-The stateless calculator that handles processing independent conversation steps.
+The stateless processing node responsible for computing single inference turns.
 
-* Reconstructs the systemic history layout block dynamically by blending compiled system directives smoothly with historical conversation slices.
-* Extracts the predicted thoughts out of incoming network payload segments.
-* Automatically converts and sanitizes raw, complex Pydantic response objects into clean Python native primitive objects via `.model_dump()` to ensure problem-free upstream serialization.
+* Compiles historical conversation matrices cleanly, blending current contexts seamlessly with active state variables.
+* Extracts structural tool invocations from incoming network raw packets.
+* Ensures strict compliance with upstream workflows by utilizing Pydantic's `.model_dump(exclude_none=True)` to convert complex SDK objects into flat, primitive dictionaries suitable for JSON storage.
 
 ### 🔄 6. The Durable Orchestration Queue (`harness/queue.py`)
 
-The stateful, fault-tolerant heartbeat that orchestrates the continuous Think-Act-Observe cycle.
+The stateful, fault-tolerant memory engine that manages the continuous Think-Act-Observe cycle.
 
-* Implements **Durable Execution** using Inngest background event processing loops.
-* Uses cryptographic step-level checkpoints (`ctx.step.run`) to permanently write intermediate LLM choices and terminal tool logs into a persistent state ledger.
-* Prevents data and monetary loss: If a network timeout, code exception, or server crash happens midway through a complex task, the queue resumes precisely from the last successful step without wasting tokens on recalculating previous states.
+* Orchestrates durable execution paradigms using Inngest event messaging micro-queues.
+* Enforces structural state encapsulation checkpoints (`ctx.step.run`) around inference iterations and shell actions to create historical database markers.
+* Eliminates operational losses: If a local server crashes, a network connection fails, or an API threshold drops mid-assignment, the workflow safely restores state metrics from its latest checkpoint without duplicating tokens or repeating completed tasks.
 
 ---
 
-## 🚀 Step-by-Step Installation & Bootup
+## 🚀 Installation & System Activation
 
 ### Prerequisites
 
-* Ensure that [uv](https://github.com/astral-sh/uv) is installed.
-* Node.js runtime installed (for running the Inngest local dev dashboard).
+* Ensure that the [uv package manager](https://github.com/astral-sh/uv) is installed.
+* Node.js runtime environment installed (for hosting the Inngest engine monitoring panel).
 
-### 1. Synchronize the Environment
+### 1. Align Virtual Dependencies
 
-Navigate into your local workspace directory and align the virtual environment states using the lockfile configuration:
+Navigate into your workspace application root and map dependencies using your lockfile settings:
 
 ```bash
 uv sync
 
 ```
 
-### 2. Configure Environment Keys
+### 2. Spawn the Core Application Server
 
-Create a `.env` configuration template in the absolute root folder next to `pyproject.toml`:
-
-```env
-OPENAI_API_KEY="your-actual-secret-openai-api-key"
-ENVIRONMENT="sandbox-v1"
-
-```
-
-### 3. Initialize the Web Server Framework
-
-Boot up the FastAPI platform server application layer through your locked local project environment:
+Boot up the FastAPI background worker framework out of your local locked execution shell context:
 
 ```bash
 uv run python -m uvicorn main:app --reload
 
 ```
 
-*The host API endpoint will now be active, scanning, and listening on `http://127.0.0.1:8000`.*
+*The host API process will initialize and listen on `http://127.0.0.1:8000`.*
 
-### 4. Ignite the Inngest Developer Workspace
+### 3. Ignite the Event Pipeline Gateway
 
-Open a secondary terminal workspace pane, head to the project folder root, and spawn the visual event streaming dashboard pipeline:
+Open a secondary terminal window pane, jump to the root project workspace folder, and initialize the background event router:
 
 ```bash
 npx inngest-cli@latest dev -u [http://127.0.0.1:8000/api/inngest](http://127.0.0.1:8000/api/inngest)
 
 ```
 
+*The central orchestration monitor layout will light up and be visible on `http://localhost:8288`.*
+
 ---
 
-## 🕹️ Driving Your First Agent Job Sequence
+## 🕹️ Driving Tasks via the Interactive CLI UI
 
-1. Launch your browser window and navigate to the visual engineering panel layout running at **`http://localhost:8288`**.
-2. Click the **Send test event** button in the top-right console dashboard region.
-3. Configure the **Event Name** mapping parameter value explicitly to: `agent/run.task`
-4. Paste the following structured data payload block inside the JSON input editor, adjusting parameters as desired:
+Forge ships with a powerful, smart terminal environment manager that eliminates the need to compile manual JSON inputs.
 
-```json
-{
-  "name": "agent/run.task",
-  "data": {
-    "task": "Create a new directory named 'forge_output', go inside it, and create a text file named 'success.txt' with the content 'Forge is alive!'.",
-    "model_name": "gpt-4o-mini"
-  }
-}
+Open a third terminal window tab and invoke the CLI:
+
+```bash
+uv run python cli.py
 
 ```
 
-5. Click **Invoke**. Go to the **Runs** tab to watch the execution waterfall graph log steps, execute shell actions, and record immutable checkpoints in real-time.
+### Key Management Wizard Onboarding
+
+If your `.env` configuration file is fresh or lacks active API keys, the CLI will run a pre-flight interception sweep. You will be prompted with an onboarding menu to select your provider (OpenAI, Groq, Vercel, or local Ollama) and paste your credentials. The utility will dynamically save them straight into your local workspace setup.
+
+### Directing the Agent
+
+Once authorized, use the console prompts to input assignments and select models by leveraging prefix parameters:
+
+```text
+==================================================
+   🔨 FORGE: Multi-Provider Coding Agent CLI      
+==================================================
+
+Forge 🤖 ❯ Enter task description: Create a text file named forge_rocks.txt
+ 
+💡 Model Naming Examples:
+ - OpenAI: gpt-4o-mini, gpt-4o
+ - Groq:   groq/llama-3.3-70b-specdec
+ - Vercel: vercel/claude-3-5-sonnet
+ - Local:  local-llama3
+
+Forge 🤖 ❯ Select model target [default: gpt-4o-mini]: groq/llama-3.3-70b-specdec
+
+🚀 Dispatching task event token to background execution queues...
+✅ Task scheduled perfectly! Watch progress in your Inngest dev console.
+
+```
+
+Open your Inngest Dev Dashboard at **`http://localhost:8288/runs`** to watch the waterfall timeline execute code, trigger the whitelisted hardware steps, and record immutable checkpoints in real-time.
 
 ```
