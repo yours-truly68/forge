@@ -36,7 +36,7 @@ def run_bash_command(command: str) -> str:
 BASH_TOOL_SCHEMA = {
         "type" : "function",
         "function": {
-            "name": "rush_bash_command",
+            "name": "run_bash_command",
             "description": "Execute a command in the local bash shell workspace to create files, run scripts, check directory contents, or test code.",
             "parameters": {
                 "type": "object",
