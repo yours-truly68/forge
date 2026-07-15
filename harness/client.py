@@ -16,10 +16,14 @@ class LLMHarnessClient:
         Evaluates the model name string target to return the correctly configured 
         SDK client instance along with its validated authentication security key.
         """
+        # harness/client.py (Update the local route branch)
+
         # 1. Local Ollama Mapping Route
         if model_name.startswith("local-") or model_name in ["llama3", "mistral", "phi3"]:
             local_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
-            return OpenAI(base_url=local_url, api_key="ollama-passthrough"), model_name
+            # CRITICAL FIX: Strip off the local- prefix so Ollama gets the exact model tag
+            target_model = model_name.replace("local-", "")
+            return OpenAI(base_url=local_url, api_key="ollama-passthrough"), target_model
             
         # 2. Groq Cloud Engine Mapping Route
         elif model_name.startswith("groq/") or "llama-3" in model_name or "mixtral" in model_name:
