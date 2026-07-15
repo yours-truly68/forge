@@ -1,12 +1,15 @@
 import subprocess
 from config import settings
 
-
 def run_bash_command(command: str) -> str:
     """
     Safely executes bash terminal commands locally and intercepts the output.
     """
-    #Primary command
+    # Block dangerous or hidden redirects that throw away output
+    if "> /dev/null" in command:
+        # Strip out the silent redirect so we can actually capture what happened
+        command = command.replace("> /dev/null", "").strip()
+
     primary_command = command.strip().split()[0] if command.strip() else ""
     
     if primary_command not in settings.ALLOWED_COMMANDS:
@@ -21,42 +24,38 @@ def run_bash_command(command: str) -> str:
             timeout=20
         )
         
+        # Capture stdout and stderr
         output = result.stdout
         if result.stderr:
-            output += f"\nError:\n {result.stderr}"
+            output += f"\nError output:\n{result.stderr}"
             
-        return output if output.strip() else "Command executed successfully (no output)."
+        return output if output.strip() else "Command executed successfully with no output."
     
     except subprocess.TimeoutExpired:
         return "Error: Command execution timed out after 20 seconds."
     except Exception as e:
         return f"Error executing command: {str(e)}"
-    
-    
+
+
+# --- STRICTLY ENFORCED SCHEMA ---
 BASH_TOOL_SCHEMA = {
     "type": "function",
     "function": {
         "name": "run_bash_command",
         "description": (
-            "Execute a command in the local bash shell workspace. "
-            "CRITICAL: When writing multi-line code or text containing parentheses () or brackets [] to a file, "
-            "never use raw echo. ALWAYS use a heredoc template with single-quotes around EOF to prevent shell "
-            "syntax errors. Example:\n"
-            "cat << 'EOF' > filename.py\n"
-            "def add(a, b):\n"
-            "    return a + b\n"
-            "EOF"
+            "Execute a standard local bash command to create files, run python tests, or check directory statuses. "
+            "To write a file, write a clean 'cat' command with a single-quoted heredoc delimiter to prevent "
+            "syntax errors. Never redirect command outputs to /dev/null."
         ),
         "parameters": {
             "type": "object",
             "properties": {
                 "command": {
                     "type": "string",
-                    "description": "The exact bash command to execute."
+                    "description": "The exact bash command to execute (e.g., 'cat << 'EOF' > add.py\\ndef add(a,b):\\n    return a+b\\nEOF' or 'python3 add.py')."
                 }
             },
             "required": ["command"]
         }
     }
 }
-    

@@ -13,6 +13,29 @@ from cli.interface import (
 
 def ask_multiline_task() -> str:
     """
+    Collects task input from the terminal.
+    - If it's a standard single line, it submits immediately on Enter.
+    - If a line ends with a backslash '\\', it continues on the next line.
+    """
+    console.print("\n[brand]forge[/brand] [agent]🤖[/agent] [subtle](Enter task. End with '\\' for multi-line)[/subtle]:")
+    
+    lines = []
+    while True:
+        try:
+            line = input()
+            # If the line ends with a backslash, strip it and prepare for more lines
+            if line.endswith("\\"):
+                lines.append(line[:-1])  # Store line without the backslash
+                continue
+            
+            # Otherwise, append this final line and break
+            lines.append(line)
+            break
+        except KeyboardInterrupt:
+            raise KeyboardInterrupt
+            
+    return "\n".join(lines).strip()
+    """
     Collects multiple lines of input from the terminal.
     Submits when the user presses Enter on an empty line.
     """
