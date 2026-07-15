@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 import inngest.fast_api
 from harness.queue import inngest_client, run_durable_agent_loop
-from config import ApprovalSubmit
 
 
 
