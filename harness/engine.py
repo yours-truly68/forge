@@ -25,6 +25,7 @@ def compute_agent_step(agent: AgentPersona, history: list, model_name: str) -> d
             })
 
     # CRITICAL FIX: Convert the native OpenAI Pydantic model into a primitive dictionary
+    
     # so Inngest can seamlessly serialize and checkpoint the step data.
     serializable_message = assistant_msg.model_dump(exclude_none=True)
 

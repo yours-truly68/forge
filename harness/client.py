@@ -1,5 +1,3 @@
-# harness/client.py
-import os
 from openai import OpenAI
 from config import settings
 from tools.terminal import BASH_TOOL_SCHEMA
@@ -20,27 +18,31 @@ class LLMHarnessClient:
 
         # 1. Local Ollama Mapping Route
         if model_name.startswith("local-") or model_name in ["llama3", "mistral", "phi3"]:
-            local_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+            # local_url = os.getenv("{OLLAMA_BASE_URL", "http://localhost:11434/v1")
+            local_url = settings.OLLAMA_BASE_URL or "http://localhost:1143/v1"
             # CRITICAL FIX: Strip off the local- prefix so Ollama gets the exact model tag
             target_model = model_name.replace("local-", "")
             return OpenAI(base_url=local_url, api_key="ollama-passthrough"), target_model
             
         # 2. Groq Cloud Engine Mapping Route
         elif model_name.startswith("groq/") or "llama-3" in model_name or "mixtral" in model_name:
-            groq_key = os.getenv("GROQ_API_KEY", "")
+            # groq_key = os.getenv("GROQ_API_KEY", "")
+            groq_key = settings.GROQ_API_KEY or ""
+            # base_url=os.getenv("GROQ_BASE_URL","https://api.groq.com/openai/v1"),
+            base_url = settings.GROQ_BASE_URL or "https://api/groq.com/openai/v1"
             target_model = model_name.replace("groq/", "")
+            
             return OpenAI(
-                base_url=os.getenv("GROQ_BASE_URL","https://api.groq.com/openai/v1"),
+                base_url=base_url,
                 api_key=groq_key
             ), target_model
 
-        # 3. 🚀 NEW: Vercel AI Gateway Route
+        # 3.  NEW: Vercel AI Gateway Route
         elif model_name.startswith("vercel/"):
-            vercel_key = os.getenv("VERCEL_API_KEY", "")
-            # Expecting VERCEL_GATEWAY_URL to look like: 
-            # https://gateway.ai.vercel.com/v1/campuses/your-team-slug/gateways/your-gateway-id
-            gateway_url = os.getenv("VERCEL_BASE_URL", "")
-            
+            # vercel_key = os.getenv("VERCEL_API_KEY", "")
+            vercel_key = settings.VERCEL_API_KEY or ""
+            # gateway_url = os.getenv("VERCEL_BASE_URL", "")
+            gateway_url = settings.VERCEL_BASE_URL or ""            
             target_model = model_name.replace("vercel/", "")
             return OpenAI(
                 base_url=gateway_url,

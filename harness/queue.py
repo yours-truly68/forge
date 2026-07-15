@@ -1,3 +1,4 @@
+#AGENTIC LOOP --> this is where the actual loop lives 
 import inngest
 from tools.terminal import run_bash_command
 from harness.engine import compute_agent_step
@@ -12,9 +13,9 @@ inngest_client = inngest.Inngest(app_id="forge_agent_platform", is_production=Fa
 )
 
 
-async def run_durable_agent_loop(context: inngest.Contextn):
+async def run_durable_agent_loop(context: inngest.Context):
     task_prompt = context.event.data["task"]
-    model_name=context.event.data.get("model_name", "gpt-4o")
+    model_name=context.event.data.get("model_name", "vercel/gpt-4o-mini")
     
     chat_history = [{"role": "user", "content": task_prompt}]
     
@@ -22,7 +23,6 @@ async def run_durable_agent_loop(context: inngest.Contextn):
     for iteration in range(5):
         
         #Checkpoint LLM reasoning cycle
-        
         step_result = await context.step.run(
             f"llm_inference_turn-{iteration}",
             lambda: compute_agent_step(CODE_EXECUTOR, chat_history, model_name)
