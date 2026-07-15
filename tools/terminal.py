@@ -24,12 +24,17 @@ def run_bash_command(command: str) -> str:
             timeout=20
         )
         
-        # Capture stdout and stderr
+        # 🛡️ THE FIX: If the exit code is not 0, the command failed!
+        if result.returncode != 0:
+            error_msg = f"Execution Failed (Exit Code {result.returncode})."
+            if result.stderr:
+                error_msg += f"\nShell Error:\n{result.stderr.strip()}"
+            elif result.stdout:
+                error_msg += f"\nShell Output:\n{result.stdout.strip()}"
+            return error_msg
+
         output = result.stdout
-        if result.stderr:
-            output += f"\nError output:\n{result.stderr}"
-            
-        return output if output.strip() else "Command executed successfully with no output."
+        return output if output.strip() else "Command executed successfully (no output)."
     
     except subprocess.TimeoutExpired:
         return "Error: Command execution timed out after 20 seconds."
