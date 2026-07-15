@@ -34,20 +34,29 @@ def run_bash_command(command: str) -> str:
     
     
 BASH_TOOL_SCHEMA = {
-        "type" : "function",
-        "function": {
-            "name": "run_bash_command",
-            "description": "Execute a command in the local bash shell workspace to create files, run scripts, check directory contents, or test code.",
-            "parameters": {
-                "type": "object",
-                "properties" : {
-                    "command": {
-                        "type": "string",
-                        "description" : "The exact bash command to execute in the terminal (e.g., 'ls -la' or 'cat main.py')."
-                    }
-                },
-                "required" : ["command"]
-            }
+    "type": "function",
+    "function": {
+        "name": "run_bash_command",
+        "description": (
+            "Execute a command in the local bash shell workspace. "
+            "CRITICAL: When writing multi-line code or text containing parentheses () or brackets [] to a file, "
+            "never use raw echo. ALWAYS use a heredoc template with single-quotes around EOF to prevent shell "
+            "syntax errors. Example:\n"
+            "cat << 'EOF' > filename.py\n"
+            "def add(a, b):\n"
+            "    return a + b\n"
+            "EOF"
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "type": "string",
+                    "description": "The exact bash command to execute."
+                }
+            },
+            "required": ["command"]
         }
     }
+}
     
