@@ -17,6 +17,9 @@ class Settings(BaseSettings):
         "find",
         "grep",
         "tree",
+        
+        "rm",
+        "rmdir"
 
         "git",
         "uv",
