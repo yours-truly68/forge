@@ -35,25 +35,7 @@ def ask_multiline_task() -> str:
             raise KeyboardInterrupt
             
     return "\n".join(lines).strip()
-    """
-    Collects multiple lines of input from the terminal.
-    Submits when the user presses Enter on an empty line.
-    """
-    console.print("\n[brand]forge[/brand] [agent]🤖[/agent] [subtle](Enter task. Press Enter on an empty line to submit)[/subtle]:")
-    
-    lines = []
-    while True:
-        try:
-            # Grab raw input line by line
-            line = input()
-            if line == "":
-                break
-            lines.append(line)
-        except KeyboardInterrupt:
-            # Pass it up to the main loop to exit gracefully
-            raise KeyboardInterrupt
-            
-    return "\n".join(lines).strip()
+
 
 def is_strictly_coding_task(prompt_text: str) -> bool:
     """
@@ -89,6 +71,7 @@ def is_strictly_coding_task(prompt_text: str) -> bool:
         
     return True
 
+
 def run_cli_session():
     """Core terminal execution loop."""
     render_banner()
@@ -99,7 +82,7 @@ def run_cli_session():
         
     while True:
         try:
-            # 💡 SWAPPED: Now calls our multi-line collector instead of single-line Prompt.ask
+            # Calls the smart multi-line collector
             task = ask_multiline_task()
             
             if not task:
@@ -129,43 +112,7 @@ def run_cli_session():
         except KeyboardInterrupt:
             console.print("\n\n[subtle]👋 Keyboard interrupt detected. Exiting.[/subtle]")
             break
-    """Core terminal execution loop."""
-    render_banner()
-    
-    # Pre-flight credential verification
-    if not any(get_stored_keys().values()):
-        run_onboarding_wizard()
-        
-    while True:
-        try:
-            task = Prompt.ask("\n[brand]forge[/brand] [agent]🤖[/agent] [subtle](Enter your task)[/subtle]").strip()
-            if not task:
-                continue
-            if task.lower() in ["exit", "quit"]:
-                console.print("\n[subtle]👋 Shutdown signal received. Exiting Forge shell.[/subtle]")
-                break
-            
-            # 🛡️ THE GUARDRAIL: Pre-flight domain verification
-            if not is_strictly_coding_task(task):
-                console.print("\n")
-                console.print(Panel(
-                    "[error]⛔ ACCESS DENIED: NON-DEVELOPMENT PROMPT DETECTED[/error]\n\n"
-                    "Forge is optimized exclusively for software engineering tasks.\n"
-                    "Please prompt me with tasks like writing code, debugging, package installation, or directory updates.",
-                    title="[brand]Domain Guardrail[/brand]", 
-                    border_style="error"
-                ))
-                continue  # Skip to the next prompt cycle without asking for a model or dispatching
 
-            console.print("[subtle]💡 e.g., gpt-4o-mini | groq/llama-3.3-70b-specdec | vercel/claude-3-5-sonnet | local-llama3[/subtle]")
-            model = Prompt.ask("[brand]model[/brand] [subtle](default: gpt-4o-mini)[/subtle]").strip() or "gpt-4o-mini"
-            
-            # Delegates rendering and calling logic to cli/interface
-            dispatch_with_spinner(task, model)
-                
-        except KeyboardInterrupt:
-            console.print("\n\n[subtle]👋 Keyboard interrupt detected. Exiting.[/subtle]")
-            break
 
 if __name__ == "__main__":
     run_cli_session()
