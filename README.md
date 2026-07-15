@@ -1,172 +1,165 @@
+# Forge: Decoupled Agent Sandbox (The Complete Guide)
+
+## Part 1: Deep-Dive Architecture Explanation
+
+To understand why Forge is built this way, you have to understand the fundamental limitation of traditional AI agents: **The Stateless HTTP Timeout Problem.**
+
+Most simple agent frameworks run their execution loop inside a standard, synchronous HTTP request. This approach is highly fragile. If you ask an agent to scan directories, write code, run tests, and debug errors, the entire loop can easily take 2 to 5 minutes. Traditional web servers (like FastAPI, Uvicorn, or Nginx) are configured to terminate connections that remain idle for more than 30 to 60 seconds. If a timeout occurs, or if your Wi-Fi blinks, the server thread crashes. The agent loses its entire history, and any tokens you paid for up to that point are completely wasted.
+
+Forge completely solves this by decoupling the **User Interface** from the **Execution Engine** using a **Durable Event-Driven Architecture**.
+
+### 1. The CLI Client (`forge` wrapper)
+
+The command-line interface acts as a lightweight, interactive, non-blocking client.
+
+* It accepts your task prompt.
+* It runs a **local pre-flight security check** using a fast local LLM to ensure the prompt is strictly about coding.
+* Instead of running the task itself, it submits a fire-and-forget event payload containing the task to your FastAPI backend and **immediately frees up the shell**.
+* It then enters a lightweight **polling loop**, checking the status of the run via HTTP every second. This keeps the CLI responsive and allows it to show a continuous, animated status spinner while the heavy lifting happens elsewhere.
+
+### 2. The Orchestrator (Inngest)
+
+Once the FastAPI backend receives the event, it hands it off to **Inngest**, a durable execution engine.
+
+* Inngest runs your Python code as a series of isolated, checkpointed steps using `await context.step.run()`.
+* Every time your agent makes an LLM reasoning call or runs a whitelisted shell command, Inngest **checkpoints and freezes the state** in its database.
+* If your local server restarts, crashes, or loses power, Inngest does not lose the state. Once the server is back online, Inngest checks its execution log, finds the last successfully completed step, and **resumes the agent from that exact microsecond** without wasting duplicate API tokens.
+
+### 3. The Secure Terminal Executor
+
+When the agent decides to execute a bash command (like compiling a file or running tests), the request goes through a secure middleware guardrail.
+
+* The command is parsed, and the primary command (e.g., `git`, `python`, `mkdir`) is checked against a strict, deterministic whitelist in your `Settings` config.
+* If the command is not explicitly allowed, execution is blocked, and a security warning is returned to the agent's context, protecting your host operating system from destructive or hallucinated commands.
+
+---
+
+## Part 2: Installation & Workspace Setup
+
+This setup guide configures **Forge** to run globally on your system, allowing you to use the `forge` command inside any workspace or directory on your Mac.
+
+### Step 1: Install System Dependencies
+
+Forge relies on **`uv`** (a lightning-fast Python package manager) and **Ollama** (to run your local pre-flight classifier model offline).
+
+1. **Install `uv**` (if you haven't already):
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 ```
-# Forge: Durable, Multi-Provider Coding Agent Platform
 
-Forge is a production-grade, highly resilient backend engine framework engineered to drive autonomous AI software engineering agents. 
 
-By anchoring the platform on a strict **Separation of Concerns**, the system ensures that AI agent personas remain completely stateless runtime entities, while the surrounding environment layers guarantee robust security guardrails, dynamic multi-provider API routing (OpenAI, Groq, Vercel AI Gateway, and local Ollama), structural data serialization, and fault-tolerant long-term memory.
-
----
-
-## 🏗️ Architectural Systems Design
-
-Forge isolates layout concerns into modular micro-packages. This decoupled design makes horizontal scaling seamless—allowing you to extend utility toolsets, introduce alternative foundation gateways, or orchestrate complex verification loops without modifying the core inference loop.
-
-```text
-forge/
-│
-├── config.py         # Centralized environment configurations & path scopes
-├── main.py           # Application Factory setup (FastAPI + Inngest)
-├── cli.py            # Interactive CLI & credential configuration manager
-├── pyproject.toml    # Virtual environment rules and dependencies
-│
-├── agents/
-│   ├── __init__.py
-│   └── registry.py   # Immutable system parameters of stateless agent personas
-│
-├── harness/
-│   ├── __init__.py
-│   ├── client.py     # Provider-agnostic API switchboard & gateway router
-│   ├── engine.py     # Stateless single-step inference execution processor
-│   └── queue.py      # Stateful, durable background execution orchestrator (Inngest)
-│
-└── tools/
-    ├── __init__.py
-    └── terminal.py   # Protected system-level execution utilities & schemas
+2. **Install and Run Ollama**:
+* Download Ollama from [ollama.com](https://ollama.com/).
+* Open your terminal and pull the lightweight `llama3.2` model used for fast pre-flight classification:
+```bash
+ollama pull llama3.2:latest
 
 ```
 
----
 
-## 🧩 Comprehensive Module Breakdown
 
-### 🛡️ 1. The Configuration Layer (`config.py`)
 
-Acts as the global **Single Source of Truth** for system parameters.
 
-* Resolves workspace boundaries using script-relative absolute path processing to prevent environment collision.
-* Maintains a rigorous command execution blocklist (`ALLOWED_COMMANDS`) to instantly trap and neutralize unauthorized terminal inputs before they touch the processor.
-* Leverages `pydantic-settings` to deliver unified, type-validated app state configurations on initialization.
+### Step 2: Configure Your Local Workspace
 
-### 🎭 2. The Stateless Registry Layer (`agents/registry.py`)
+1. Navigate to your project directory:
+```bash
+cd /Users/mohammadrazim/Desktop/Projects/coding-agent
 
-Maintains pure data blueprints defining structural agent prompts and instructions.
+```
 
-* **100% Stateless Architecture:** Persona vectors hold absolutely zero active step parameters, system context arrays, or operational token memory slots.
-* Employs a text compilation driver (`compile_agent_prompt`) that dynamically flushes current local directory states and operational boundaries into the runtime prompt trace immediately before inference.
 
-### 🔌 3. The Protected Hardware Interface (`tools/terminal.py`)
-
-Serves as the physical hands of the AI agent on the host machine.
-
-* Connects directly with the operating system shell using Python's primitive `subprocess` utility.
-* Acts as an inline security interceptor, checking the first keyword token of all incoming agent requests against the global configuration whitelist.
-* Intercepts standard streams, cleans output buffers, catches system exceptions, and forces a hard **20-second execution timeout** to prevent zombie loops or interactive prompt blockages.
-
-### 📡 4. The Multi-Provider Gateway Client (`harness/client.py`)
-
-An advanced, provider-agnostic networking diplomat that abstracts vendor configurations away from the loop.
-
-* Dynamically routes structural payload messages to OpenAI, Groq Cloud, Vercel AI Gateway, or local Ollama instances based on simple string prefixes (`groq/`, `vercel/`, `local-`).
-* Leverages OpenAI-compatible API layers to maintain a unified method structure while mounting operational function schemas (`tool_choice="auto"`) across all models natively.
-
-### 🧠 5. The Reasoning Engine Layer (`harness/engine.py`)
-
-The stateless processing node responsible for computing single inference turns.
-
-* Compiles historical conversation matrices cleanly, blending current contexts seamlessly with active state variables.
-* Extracts structural tool invocations from incoming network raw packets.
-* Ensures strict compliance with upstream workflows by utilizing Pydantic's `.model_dump(exclude_none=True)` to convert complex SDK objects into flat, primitive dictionaries suitable for JSON storage.
-
-### 🔄 6. The Durable Orchestration Queue (`harness/queue.py`)
-
-The stateful, fault-tolerant memory engine that manages the continuous Think-Act-Observe cycle.
-
-* Orchestrates durable execution paradigms using Inngest event messaging micro-queues.
-* Enforces structural state encapsulation checkpoints (`ctx.step.run`) around inference iterations and shell actions to create historical database markers.
-* Eliminates operational losses: If a local server crashes, a network connection fails, or an API threshold drops mid-assignment, the workflow safely restores state metrics from its latest checkpoint without duplicating tokens or repeating completed tasks.
-
----
-
-## 🚀 Installation & System Activation
-
-### Prerequisites
-
-* Ensure that the [uv package manager](https://github.com/astral-sh/uv) is installed.
-* Node.js runtime environment installed (for hosting the Inngest engine monitoring panel).
-
-### 1. Align Virtual Dependencies
-
-Navigate into your workspace application root and map dependencies using your lockfile settings:
-
+2. Sync and lock your Python virtual environment dependencies:
 ```bash
 uv sync
 
 ```
 
-### 2. Spawn the Core Application Server
 
-Boot up the FastAPI background worker framework out of your local locked execution shell context:
+
+### Step 3: Install Forge Globally on Your Machine
+
+Forge uses **Hatchling** as its modern build backend to package your project natively. To install the CLI globally so you can trigger it from anywhere:
 
 ```bash
-uv run python -m uvicorn main:app --reload
+uv tool install . --force
 
 ```
 
-*The host API process will initialize and listen on `http://127.0.0.1:8000`.*
-
-### 3. Ignite the Event Pipeline Gateway
-
-Open a secondary terminal window pane, jump to the root project workspace folder, and initialize the background event router:
-
-```bash
-npx inngest-cli@latest dev -u [http://127.0.0.1:8000/api/inngest](http://127.0.0.1:8000/api/inngest)
-
-```
-
-*The central orchestration monitor layout will light up and be visible on `http://localhost:8288`.*
+*(This compiles the `cli` package, provisions an isolated global virtual environment, and links the global executable binary `forge` to your system's `$PATH`.)*
 
 ---
 
-## 🕹️ Driving Tasks via the Interactive CLI UI
+## Part 3: Running and Configuring Forge
 
-Forge ships with a powerful, smart terminal environment manager that eliminates the need to compile manual JSON inputs.
+### 1. Launching the Backend Servers
 
-Open a third terminal window tab and invoke the CLI:
+Because Forge is a decoupled system, your backend queue and Inngest engine must be running in the background to process dispatched tasks.
+
+* **Start your FastAPI application** (which hosts your agent runner endpoints):
+```bash
+uvicorn main:app --reload --port 8000
+
+```
+
+
+* **Start the Inngest Dev Server** (which manages your background step queues and state logging):
+```bash
+inngest-cli dev
+
+```
+
+
+*(You can inspect your live agent runs, variable histories, and step waterfall timelines visually by opening **`http://localhost:8288`** in your browser.)*
+
+### 2. Launching the CLI
+
+Open a brand new terminal window, navigate to **any folder** on your computer where you want to perform coding tasks, and simply type:
 
 ```bash
-uv run python cli.py
+forge
 
 ```
 
-### Key Management Wizard Onboarding
+---
 
-If your `.env` configuration file is fresh or lacks active API keys, the CLI will run a pre-flight interception sweep. You will be prompted with an onboarding menu to select your provider (OpenAI, Groq, Vercel, or local Ollama) and paste your credentials. The utility will dynamically save them straight into your local workspace setup.
+## Part 4: Step-by-Step Usage Guide
 
-### Directing the Agent
+### Scenario A: Running a Valid Coding Task
 
-Once authorized, use the console prompts to input assignments and select models by leveraging prefix parameters:
-
+1. When prompted, enter a software development task:
 ```text
-==================================================
-   🔨 FORGE: Multi-Provider Coding Agent CLI      
-==================================================
-
-Forge 🤖 ❯ Enter task description: Create a text file named forge_rocks.txt
- 
-💡 Model Naming Examples:
- - OpenAI: gpt-4o-mini, gpt-4o
- - Groq:   groq/llama-3.3-70b-specdec
- - Vercel: vercel/claude-3-5-sonnet
- - Local:  local-llama3
-
-Forge 🤖 ❯ Select model target [default: gpt-4o-mini]: groq/llama-3.3-70b-specdec
-
-🚀 Dispatching task event token to background execution queues...
-✅ Task scheduled perfectly! Watch progress in your Inngest dev console.
+forge 🤖 ❯ (Enter your task): Create a new directory named 'calculator_app', add a python script that multiplies two numbers inside it, and verify it exists.
 
 ```
 
-Open your Inngest Dev Dashboard at **`http://localhost:8288/runs`** to watch the waterfall timeline execute code, trigger the whitelisted hardware steps, and record immutable checkpoints in real-time.
+
+2. Choose your model (press Enter to default to `gpt-4o-mini`, or type `local-llama3.2:latest` to run completely offline).
+3. The CLI will transition to an active thinking spinner while the background queue securely runs `mkdir`, writing files, and inspecting paths.
+4. Once completed, the spinner disappears and is replaced with a green success panel:
+```text
+✔ Task executed and completed successfully!
 
 ```
+
+
+
+### Scenario B: Testing the Domain Guardrail
+
+1. Try prompting the agent with a non-development or general conversational task:
+```text
+forge 🤖 ❯ (Enter your task): Write a romantic story about a programmer.
+
+```
+
+
+2. The local `llama3.2` model runs a lightning-fast pre-flight check on the prompt string.
+3. The prompt is instantly blocked before it ever hits Inngest or your paid API endpoints:
+```text
+⛔ ACCESS DENIED: NON-DEVELOPMENT PROMPT DETECTED
+
+Forge is optimized exclusively for software engineering tasks.
+Please prompt me with tasks like writing code, debugging, package installation, or directory updates.
+
 ```
