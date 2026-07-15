@@ -57,10 +57,10 @@ def run_onboarding_wizard():
     save_credential(env_var, key_val)
     
     if choice == "3":
-        gateway = Prompt.ask("Enter your [brand]VERCEL_GATEWAY_URL[/brand]").strip()
+        gateway = Prompt.ask("Enter your [brand]VERCEL_BASE_URL[/brand]").strip()
         save_credential("VERCEL_GATEWAY_URL", gateway)
 
-    console.print(f"\n[success]✔ Config updated! Key saved to .env.[/success]\n")
+    console.print("\n[success]✔ Config updated! Key saved to .env.[/success]\n")
 
 def dispatch_with_spinner(task: str, model: str):
     """Wraps the task dispatch and live polling inside a clean Claude-style loading spinner."""
