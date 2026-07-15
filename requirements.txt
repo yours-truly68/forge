@@ -4,3 +4,4 @@ pydantic-settings
 inngest
 python-dotenv
 fastapi
+rich
