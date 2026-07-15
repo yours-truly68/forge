@@ -2,7 +2,6 @@ import httpx
 from rich.panel import Panel
 from rich.prompt import Prompt
 
-from cli.auth import get_stored_keys
 from cli.interface import (
     console,
     dispatch_with_spinner,
@@ -132,21 +131,52 @@ def run_cli_session():
     render_banner()
 
     # Pre-flight credential verification
-    # if not any(get_stored_keys().values())
+    # if not any(get_stored_keys().values()):
     run_onboarding_wizard()
 
+    # 🎛️ SET SESSION MODEL (Locked once at boot)
+    console.print(
+        "\n[subtle]💡 Select your default LLM: gpt-4o-mini | groq/llama-3.3-70b-specdec | local-llama3.2:latest[/subtle]"
+    )
+    session_model = (
+        Prompt.ask(
+            "[brand]Select session model[/brand] [subtle](default: vercel/gpt-4o-mini)[/subtle]"
+        ).strip()
+        or "vercel/gpt-4o-mini"
+    )
+    console.print(
+        f"[success]✔ Active session model locked to: {session_model}[/success]\n"
+    )
+
+    # 🔄 ACTIVE COMMAND LOOP
     while True:
         try:
-            # Calls the smart multi-line collector
+            # Calls your smart multi-line collector
             task = ask_multiline_task()
 
             if not task:
                 continue
+
+            # Handle Exit Signal
             if task.lower() in ["exit", "quit", "e", "q"]:
                 console.print(
                     "\n[subtle]👋 Shutdown signal received. Exiting Forge shell.[/subtle]"
                 )
                 break
+
+            # 🔄 MODEL HOT-SWAPPING COMMAND
+            if task.startswith("/model "):
+                new_model = task.replace("/model ", "").strip()
+                if new_model:
+                    session_model = new_model
+                    console.print(
+                        f"[success]✔ Switched session model to: {session_model}[/success]"
+                    )
+                else:
+                    console.print(
+                        "[warning]⚠️ Please specify a model name (e.g., /model gpt-4o).[/warning]"
+                    )
+                continue
 
             # 🛡️ THE GUARDRAIL: Pre-flight domain verification
             if not is_strictly_coding_task(task):
@@ -167,20 +197,10 @@ def run_cli_session():
                 "[subtle]🪄 Curating and optimizing your prompt for the agent...[/subtle]"
             )
             curated_task = curate_user_prompt(task)
-            console.print(f"[subtle]Curated Prompt: {curated_task}[/subtle]\n\n")
+            console.print(f"[subtle]Curated Prompt: {curated_task}[/subtle]\n")
 
-            console.print(
-                "[subtle]💡 e.g., gpt-4o-mini | groq/llama-3.3-70b-specdec | local-llama3.2:latest[/subtle]"
-            )
-            model = (
-                Prompt.ask(
-                    "[brand]model[/brand] [subtle](default: vercel/gpt-4o-mini)[/subtle]"
-                ).strip()
-                or "vercel/gpt-4o-mini"
-            )
-            
-            # Dispatch the beautifully optimized curated task instead of the raw one!
-            dispatch_with_spinner(curated_task, model)
+            # 🚀 DISPATCH: Send the optimized curated task with your locked session model!
+            dispatch_with_spinner(curated_task, session_model)
 
         except KeyboardInterrupt:
             console.print(
