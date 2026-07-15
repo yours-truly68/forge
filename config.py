@@ -1,5 +1,6 @@
 import os
 from pydantic_settings import BaseSettings
+from pydantic import BaseModel
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -56,5 +57,7 @@ class Settings(BaseSettings):
         env_file = os.path.join(BASE_DIR, ".env")
         extra = "ignore"  # Gracefully ignore extra fields if present
 
+class ApprovalSubmit(BaseModel):
+    approved: bool
 
 settings = Settings()
