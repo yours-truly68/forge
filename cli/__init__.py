@@ -37,6 +37,43 @@ def ask_multiline_task() -> str:
     return "\n".join(lines).strip()
 
 
+def curate_user_prompt(raw_prompt: str) -> str:
+    """
+    Passes the user's raw input to a fast local model to expand it into 
+    an explicit, detailed, and tool-friendly execution plan.
+    """
+    system_instruction = (
+        "You are an expert Prompt Engineer for AI Coding Agents. Your job is to take a raw, "
+        "short user prompt and expand it into a highly explicit, step-by-step, developer-grade instruction.\n"
+        "Ensure the expanded prompt explicitly tells the agent:\n"
+        "- What files and folders to create.\n"
+        "- To write multi-line files strictly using safe shell methods like `cat << 'EOF' > filename` to avoid escaping bugs.\n"
+        "- To run and test the code to verify it works.\n"
+        "Keep the instructions practical, clear, and direct. Respond ONLY with the expanded prompt."
+    )
+    
+    try:
+        # Use your running Ollama instance to curate the prompt instantly
+        response = httpx.post(
+            "http://localhost:11434/api/generate",
+            json={
+                "model": "llama3.2:latest",
+                "prompt": f"{system_instruction}\n\nRaw user prompt to expand: {raw_prompt}",
+                "stream": False
+            },
+            timeout=8.0
+        )
+        if response.status_code == 200:
+            curated_prompt = response.json().get("response", "").strip()
+            if curated_prompt:
+                return curated_prompt
+    except Exception as e:
+        # If Ollama is offline, gracefully fall back to the raw prompt
+        pass
+        
+    return raw_prompt
+
+
 def is_strictly_coding_task(prompt_text: str) -> bool:
     """
     Uses an ultra-fast local LLM check to ensure the user is only asking for coding,
@@ -103,11 +140,16 @@ def run_cli_session():
                 ))
                 continue
 
-            console.print("[subtle]💡 e.g., gpt-4o-mini | groq/llama-3.3-70b-specdec | vercel/claude-3-5-sonnet | local-llama3[/subtle]")
-            model = Prompt.ask("[brand]model[/brand] [subtle](default: gpt-4o-mini)[/subtle]").strip() or "gpt-4o-mini"
+            # 🪄 THE CURATOR: Expand the prompt before dispatching
+            console.print("[subtle]🪄 Curating and optimizing your prompt for the agent...[/subtle]")
+            curated_task = curate_user_prompt(task)
             
-            # Delegates rendering and calling logic to cli/interface
-            dispatch_with_spinner(task, model)
+            console.print("[subtle]💡 e.g., gpt-4o-mini | groq/llama-3.3-70b-specdec | local-llama3[/subtle]")
+            model = Prompt.ask("[brand]model[/brand] [subtle](default: gpt-4o-mini)[/subtle]").strip() or "local-llama3.2:latest"
+            
+            # Dispatch the beautifully optimized curated task instead of the raw one!
+            dispatch_with_spinner(curated_task, model)
+            
                 
         except KeyboardInterrupt:
             console.print("\n\n[subtle]👋 Keyboard interrupt detected. Exiting.[/subtle]")
